@@ -1,0 +1,426 @@
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <link crossorigin="" href="https://fonts.gstatic.com/" rel="preconnect" />
+        <link
+            as="style"
+            href="https://fonts.googleapis.com/css2?display=swap&amp;family=Manrope%3Awght%40400%3B500%3B700%3B800&amp;family=Noto+Sans%3Awght%40400%3B500%3B700%3B900"
+            onload="this.rel='stylesheet'"
+            rel="stylesheet"
+        />
+        <link
+            href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined"
+            rel="stylesheet"
+        />
+        <title>Clothing Here</title>
+        <link href="data:image/x-icon;base64," rel="icon" type="image/x-icon" />
+        <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+        <style>
+            .drag-area-active {
+                border-color: #34D399;
+                background-color: #047857;
+            }
+            .success-toast {
+                animation: fadeInOut 3s ease-in-out;
+            }
+            @keyframes fadeInOut {
+                0%,
+                100% {
+                    opacity: 0;
+                    transform: translateY(20px);
+                }
+                10%,
+                90% {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+        </style>
+    </head>
+    <body class="bg-gray-900 text-gray-100" style='background-color: white; font-family: Manrope, "Noto Sans", sans-serif;'>
+        <div class="relative flex size-full min-h-screen flex-col group/design-root overflow-x-hidden">
+            <div class="layout-container flex h-full grow flex-col">
+                <main class="flex flex-1 flex-col items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+                    <div class="w-full max-w-2xl space-y-8">
+                        <div class="text-center">
+                            <h1 class="text-3xl font-bold tracking-tight text-gray-50 sm:text-4xl" 
+                            style="color: black; font-family: Arial, Helvetica, sans-serif; font-size: 110px;">
+                                Clothing here.
+                            </h1>
+                            <p class="mt-2 text-base text-gray-400", style="margin: 25px 0 0 5px;">
+                                Analyze and Elevate Your Design Taste.
+                            </p>
+                        </div>
+                        <div 
+                            class="drag-area-active relative flex flex-col items-center gap-6 rounded-lg border-2 border-gray-700 bg-gray-800 p-8 transition-all"
+                            style="background-color: whitesmoke;"
+                            id="drag-area">
+                            <span class="material-icons-outlined text-8xl text-emerald-400">
+                                upload_file
+                            </span>
+                            <!-- <button
+                                class="flex items-center gap-2 rounded-md h-10 px-4 bg-emerald-600 text-white text-sm font-medium hover:bg-emerald-700 transition-colors"
+                                onclick="document.getElementById('fileInput').click()">
+                                <span class="material-icons-outlined text-md">
+                                    add_photo_alternate
+                                </span>
+                            </button> -->
+                            <div class="text-center">
+                                <p class="text-lg font-medium"; style="color:black">
+                                    Drag &amp; drop or click to upload
+                                </p>
+                                <p class="text-xs text-gray-500">
+                                    Supports: PNG, JPG, AVIF, TIFF, HEIC, HEIF.
+                                </p>
+                            </div>
+                            <input
+                                accept="image/jpeg, image/png"
+                                class="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+                                id="fileInput"
+                                type="file"/>
+                        </div>
+                        <!-- Success Toast -->
+                        <div
+                            class="hidden success-toast fixed bottom-5 right-5 flex items-center gap-3 rounded-md bg-emerald-600 p-4 shadow-lg"
+                            id="success-message">
+                            <span class="material-icons-outlined text-white">check_circle</span>
+                            <p class="text-sm font-medium text-white">Image uploaded.</p>
+                        </div>
+                        <!-- Error: Unsupported File -->
+                        <div
+                            class="hidden flex items-center gap-3 rounded-md border border-red-600 bg-red-700/30 p-3"
+                            id="error-unsupported">
+                            <span class="material-icons-outlined text-red-600">cancel</span>
+                            <div>
+                                <p class="font-semibold text-sm text-red-600">Unsupported File</p>
+                                <p class="text-xs text-red-500">PNG, JPG, AVIF, TIFF, HEIC, HEIF Only</strong></p>
+                            </div>
+                        </div>
+                        <!-- Error: Large File -->
+                        <div
+                            class="hidden flex items-center gap-3 rounded-md border border-red-600 bg-red-700/30 p-3"
+                            id="error-large-file">
+                            <span class="material-icons-outlined text-red-400">cancel</span>
+                            <div>
+                                <p class="font-semibold text-sm text-red-400">File Too Large</p>
+                                <p class="text-xs text-red-300">Max size 10MB.</p>
+                            </div>
+                        </div>
+                        <!-- Image Preview Section -->
+                        <div class="space-y-4 hidden" id="image-preview-section">
+                            <div class="flex flex-col sm:flex-row items-start gap-4 rounded-lg p-4 shadow-sm border-2 border-gray-700">
+                                <div class="relative w-full sm:w-48 h-37 rounded-md overflow-hidden border border-gray-700">
+                                    <img
+                                        alt="Uploaded Clothing Preview"
+                                        class="h-full w-full object-contain"
+                                        id="image-preview"
+                                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuBBaEMQrgAwZo7eIeMvzZzG_e9hyP5piPzg79JvzLF_s1JSWcdKXfZEJHOzd76uoMh420t5HA6Q-MKPgFEIczsDwL9eB2sSdtfvoCD4W54BcdM6C1QIvMpgq81RyNRb8-4F7t4q7jcYCasLqwu6xl9L_dY2RfEyPBvtbcjcrLEYQWiO7rYFADtPAjnad5I8HNhWUJxXUA8VZXY5pwNPHq-lgS972BPQgTZJ14Oe_T_i2lxbCbQfKcq-4FbHVexnjCVTa4dzc84OdED5"/>
+                                </div>
+                                <div class="flex flex-col justify-between flex-1">
+                                    <div>
+                                        <p class="text-md font-semibold" style="color: black">Preview</p>
+                                        <p class="text-xs" id="image-details" style="color: black">Filename.jpg, Size: MB</p>
+                                    </div>
+                                    <!-- LLM Model Selection option -->
+                                    <select id="llm-select" class="rounded-md bg-gray-800 text-sm p-2">
+                                        <option value="0" title="Great for high volume and lower intelligence tasks">Gemini 1.5 Flash-8B</option>
+                                        <option value="1" title="Versatile across wide range of tasks">Gemini 1.5 Flash</option>
+                                        <option value="2" title="Low-latency lightweight model">Gemini 2.0 Flash-Lite</option>
+                                        <option value="3" title="High-speed with thinking">Gemini 2.0 Flash</option>
+                                        <option value="4" title="Highest performance yet limited requests available">Gemini 2.5 Flash Preview</option>
+                                    </select>
+                                    <button
+                                        id="analyze-button"
+                                        class="mt-3 flex items-center justify-center gap-2 rounded-md h-9 px-4 bg-emerald-600 text-white text-xs font-medium hover:bg-emerald-700 transition-colors sm:w-fit">
+                                        <!-- <span class="material-icons-outlined text-sm">auto_awesome</span> -->
+                                        <span class="material-icons-outlined text-sm">auto_awesome</span>
+                                        <p id="analyze-button-text">Start Analyzing</p>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- End Image Preview Section -->
+                        <div id="analysis-result" class="mt-4 text-emerald-300">
+                            <div id="analysis-description" class="text-base whitespace-pre-line" style="color: black"></div>
+                            <div id="analysis-fabric"></div>
+                            <!-- <div id="analysis-model" class="text-base text-right w-full whitespace-pre-line" style="color: black"></div> -->
+                        </div>
+                    </div>
+                </main>
+            </div>
+        </div>
+        <script>
+
+            // Triggered upon a single interaction from the user
+            let currentAudio = null;
+            let hasPlayed = false;
+            // document.addEventListener("mousemove", welcomeSpeech)
+            
+            // Get DOM elements
+            const dragArea = document.getElementById("drag-area");
+            const fileInput = document.getElementById("fileInput");
+            const imagePreviewSection = document.getElementById("image-preview-section");
+            const imagePreview = document.getElementById("image-preview");
+            const imageDetails = document.getElementById("image-details");
+            const successMessage = document.getElementById("success-message");
+            const errorUnsupported = document.getElementById("error-unsupported");
+            const errorLargeFile = document.getElementById("error-large-file");
+
+            let analyzeMode = true;
+            const analyzeButton = document.getElementById('analyze-button');
+            const analyzeButtonText = document.getElementById('analyze-button-text');
+
+            /**
+             * Show success message and image preview
+             * @param {string} fileName - Name of the uploaded file
+             * @param {string} fileSize - Size of the uploaded file (formatted)
+             */
+            const showSuccess = (fileName, fileSize) => {
+                imageDetails.textContent = `${fileName}, Size: ${fileSize}`;
+                imagePreviewSection.classList.remove("hidden");
+                successMessage.classList.remove("hidden");
+                errorUnsupported.classList.add("hidden");
+                errorLargeFile.classList.add("hidden");
+                document.getElementById("analysis-result").classList.remove("hidden");
+                // Hide success message after 3 seconds
+                setTimeout(() => successMessage.classList.add("hidden"), 3000);
+            };
+
+            /**
+             * Show error message for unsupported file type or large file
+             * @param {string} type - "unsupported" or "large"
+             */
+            const showError = (type) => {
+                imagePreviewSection.classList.add("hidden");
+                successMessage.classList.add("hidden");
+                document.getElementById("analysis-result").classList.add("hidden");
+                if (type === "unsupported") {
+                    errorUnsupported.classList.remove("hidden");
+                    errorLargeFile.classList.add("hidden");
+                } else if (type === "large") {
+                    errorLargeFile.classList.remove("hidden");
+                    errorUnsupported.classList.add("hidden");
+                }
+            };
+
+            // Highlight drag area on drag over
+            dragArea.addEventListener("dragover", (event) => {
+                event.preventDefault();
+                dragArea.classList.add("drag-area-active");
+            });
+
+            // Remove highlight when drag leaves
+            dragArea.addEventListener("dragleave", () => {
+                dragArea.classList.remove("drag-area-active");
+            });
+
+            // Handle file drop
+            dragArea.addEventListener("drop", (event) => {
+                event.preventDefault();
+                dragArea.classList.remove("drag-area-active");
+                const files = event.dataTransfer.files;
+                if (files.length > 0) {
+                    handleFile(files[0]);
+                }
+            });
+
+            // Handle file selection via input
+            fileInput.addEventListener("change", (event) => {
+                const files = event.target.files;
+                if (files.length > 0) {
+                    handleFile(files[0]);
+                }
+            });
+
+            const modelDescriptions = {
+                0: "Best for high volume and lower intelligence tasks",
+                1: "Fast and versatile performance across a diverse variety of tasks.",
+                2: "Low-latency lightweight model for mobile and embedded use.",
+                3: "High-speed model for web-scale inference tasks.",
+                4: "Highest performance."
+            };
+            const selectEl = document.getElementById("llm-select");
+            let model_id = 0;
+            console.log(model_id)
+            selectEl.addEventListener("change", function() {
+                model_id = selectEl.value;
+                chooseModel(model_id);
+                console.log(model_id)
+            });
+            // Have user choose model and apply it in setup_LLM()
+            async function chooseModel(model_id) {
+                const formData = new FormData();
+                formData.append("text", model_id);
+                console.log([...formData]);
+                await fetch("/choose_LLM", {
+                    method: "POST",
+                    body: formData,
+                });
+                analyzeMode = true;
+                analyzeButtonText.textContent = "Analyze";
+            }
+
+            // Initialize with default selection
+            window.onload = () => {
+                selectEl.dispatchEvent(new Event("change"));
+            };
+
+            analyzeButton.addEventListener("click", () => {
+                // Analyze mode
+                if (analyzeMode) {
+                    analyzeImage();
+                    analyzeMode = false;
+                }
+                // Listening mode
+                else {
+                    describeSpeech();
+                }
+            });
+
+            // async function welcomeSpeech(event) {
+            //     if (hasPlayed) return;
+            //     hasPlayed = true;
+            //     const audio = new Audio("/welcome_speech");
+            //     try {
+            //         await audio.play();
+            //         hasPlayed = true;
+            //         console.log("Audio played.");
+            //         document.removeEventListener("mousemove", welcomeSpeech);
+            //     } catch (err) {
+            //         hasPlayed = false;
+            //         console.warn("Failed to play audio:", err);
+            //     }
+            // }
+            
+            /**
+             * Handle file validation and preview
+             * @param {File} file - The uploaded file
+             */
+            async function handleFile(file) {
+                // Hide all messages and preview initially
+                errorUnsupported.classList.add("hidden");
+                errorLargeFile.classList.add("hidden");
+                successMessage.classList.add("hidden");
+                imagePreviewSection.classList.add("hidden");
+
+                const fileSizeMB = file.size / (1000 * 1000);
+                const allowedTypes = ["image/jpeg", "image/png", "image/avif", "image/tiff", "image/heic", "image/heif"];
+
+                // Check validty of image file
+                const formData = new FormData();
+                formData.append("file", file);
+                const response = await fetch("/check_image", {
+                    method: "POST",
+                    body: formData,
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    // console.log(data.status)
+                    if (!data.status) {
+                        // console.log(data.status);
+                        showError("unsupported");
+                        fileInput.value = "";
+                        return;
+                    }
+                }
+                if (!allowedTypes.includes(file.type)) {
+                    showError("unsupported");
+                    fileInput.value = "";
+                    return;
+                }
+
+                // Read and preview the image
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    imagePreview.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+
+                // Show success message and preview
+                showSuccess(file.name, `${fileSizeMB.toFixed(2)}MB`);
+                window.lastUploadedFile = file; // Store the last uploaded file globally
+                
+                // Reset analyze mode
+                analyzeMode = true;
+                analyzeButtonText.textContent = "Analyze";
+                // document.getElementById("analysis-model").textContent = "";
+                document.getElementById("analysis-description").textContent = "";
+                document.getElementById("analysis-fabric").innerHTML = "";
+            }
+            
+
+            async function analyzeImage() {
+                analyzeButtonText.textContent = "Analyzing...";
+                
+                const formData = new FormData();
+                formData.append("file", window.lastUploadedFile);
+                const response = await fetch("/analyze_image", {
+                    method: "POST",
+                    body: formData,
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    showAnalysisPanel(data);           
+                } else {
+                    document.getElementById("analyze-button").classList.add("hidden");
+                    document.getElementById("analyze-result").textContent = "Analysis failed. Please try again in a moment.";
+                }
+                
+                // showAnalysisPanel({"model": "gemini-1.5-flash-8b","description": "The garment is a slim-fitting, black, sleeveless tank top made of organic cotton and paired with dark gray, knee-length shorts.", "fabrics": {"polyester": 0.7, "satin": 0.3}});
+            }
+
+            function showAnalysisPanel(data) {
+                // document.getElementById("analysis-model").textContent = data.model;
+                document.getElementById("analysis-description").textContent = data.description;
+                // Format fabrics as a table or list
+                let fabricHTML = "";
+                if (Object.keys(data.fabrics).length > 0) {
+                    console.log(Object.entries(data.fabrics));
+                    for (const [fabric, score] of Object.entries(data.fabrics)) {
+                        fabricHTML += `<p class="fabric-types text-gray-500">${fabric}: ${(score * 100)}%</p>`;
+                    }
+                }
+                else{
+                    fabricHTML = `<p class="fabric-types text-gray-400">No fabric information available.</p>`;
+                }
+                document.getElementById("analysis-fabric").innerHTML = fabricHTML;
+                analyzeButtonText.textContent = "Listen to Analysis";
+            }
+
+            async function describeSpeech() {
+                analyzeButtonText.textContent = "...";
+                let analysisText = document.getElementById("analysis-description").textContent + ", ";
+                fabric_types = document.getElementsByClassName("fabric-types");
+                for (let i = 0; i < fabric_types.length; i++) {
+                    analysisText += `${fabric_types[i].textContent}, `;
+                }
+                const formData = new FormData();
+                formData.append("text", analysisText);
+                console.log([...formData]);
+                const response = await fetch("/describe_speech", {
+                    method: "POST",
+                    body: formData,
+                });
+                if (!response.ok) {
+                    console.error("Failed to get audio response.");
+                    return;
+                }
+                if (currentAudio) {
+                    currentAudio.pause();
+                    currentAudio.currentTime = 0;
+                }
+                const blob = await response.blob();
+                console.log(blob.type)
+                const audioURL = URL.createObjectURL(blob);
+                currentAudio = new Audio(audioURL);
+                currentAudio.play().catch(err => console.warn("Playback blocked: ", err));
+                analyzeButtonText.textContent = "Listen to Analysis";
+                // const utterance = new SpeechSynthesisUtterance(analysisText);
+                // utterance.lang = "en-US";
+                // window.speechSynthesis.cancel();
+                // window.speechSynthesis.speak(utterance);
+            }
+
+        </script>
+    </body>
+</html>

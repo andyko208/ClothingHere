@@ -1,1 +1,2 @@
-# clothinghere
+# ClothingHere
+Elevate your design taste.
