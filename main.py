@@ -101,25 +101,25 @@ async def analyze_image(file: UploadFile = File(...)):
         return JSONResponse(content=json.loads(r[r.find('{'):r.rfind('}')+1]))
     return JSONResponse(content={"description": f'Request timeout.', "fabrics": {}})
 
-from TTS.api import TTS
-coqui_tts = TTS(model_name="tts_models/en/ljspeech/tacotron2-DDC", progress_bar=False, gpu=False)
-@app.get("/welcome_speech")
-async def welcome_speech():
-    os.makedirs("tmp_audio", exist_ok=True)
-    path = "tmp_audio/welcome.mp3"
-    if not os.path.exists(path):
-        coqui_tts.tts_to_file(text="Clothing, here. Press enter for an example.", file_path=path)
-    return FileResponse(path, media_type="audio/mpeg")
+# from TTS.api import TTS
+# coqui_tts = TTS(model_name="tts_models/en/ljspeech/tacotron2-DDC", progress_bar=False, gpu=False)
+# @app.get("/welcome_speech")
+# async def welcome_speech():
+#     os.makedirs("tmp_audio", exist_ok=True)
+#     path = "tmp_audio/welcome.mp3"
+#     if not os.path.exists(path):
+#         coqui_tts.tts_to_file(text="Clothing, here. Press enter for an example.", file_path=path)
+#     return FileResponse(path, media_type="audio/mpeg")
 
 
-@app.post("/describe_speech")
-async def describe_speech(text: str = Form(...)):
-    os.makedirs("tmp_audio", exist_ok=True)
-    path = f"tmp_audio/{hash(text)}.mp3"
-    if not os.path.exists(path):
-        try:
-            coqui_tts.tts_to_file(text=text, file_path=path)
-        except Exception as e:
-            print("TTS conversion error:", e)
-            return JSONResponse(status_code=500, content={"error": str(e)})
-    return FileResponse(path, media_type="audio/mpeg")
+# @app.post("/describe_speech")
+# async def describe_speech(text: str = Form(...)):
+#     os.makedirs("tmp_audio", exist_ok=True)
+#     path = f"tmp_audio/{hash(text)}.mp3"
+#     if not os.path.exists(path):
+#         try:
+#             coqui_tts.tts_to_file(text=text, file_path=path)
+#         except Exception as e:
+#             print("TTS conversion error:", e)
+#             return JSONResponse(status_code=500, content={"error": str(e)})
+#     return FileResponse(path, media_type="audio/mpeg")

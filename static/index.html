@@ -157,6 +157,7 @@
             let localAudio = true;
             let currentAudio = null;
             let welcomePlayed = false;
+
             document.addEventListener("keydown", function(event) {
                 if (event.code === "Space" && !welcomePlayed) {
                     event.preventDefault(); // prevent page scroll on spacebar
@@ -314,26 +315,35 @@
 
             async function welcomeSpeech(event) {
                 if (welcomePlayed) return;
-                if (!localAudio){
-                    const audio = new Audio("/welcome_speech");
-                    try {
-                        await audio.play();
-                        welcomePlayed = true;
-                        console.log("Audio played.");
-                    } catch (err) {
-                        welcomePlayed = false;
-                        console.warn("Failed to play audio:", err);
-                    }
-                }
-                else {
-                    welcomeText = "Clothing, here. Press enter for an example.";
-                    const utterance = new SpeechSynthesisUtterance(welcomeText);
-                    utterance.lang = "en-US";
-                    window.speechSynthesis.cancel();
-                    window.speechSynthesis.speak(utterance);
-                    welcomePlayed = true;
-
-                }
+                // if (!localAudio){
+                //     const audio = new Audio("/welcome_speech");
+                //     try {
+                //         await audio.play();
+                //         welcomePlayed = true;
+                //         console.log("Audio played.");
+                //     } catch (err) {
+                //         welcomePlayed = false;
+                //         console.warn("Failed to play audio:", err);
+                //     }
+                // }
+                // else {
+                //     welcomeText = "Clothing, here. Press enter for an example.";
+                //     const utterance = new SpeechSynthesisUtterance(welcomeText);
+                //     utterance.lang = "en-US";
+                //     utterance.volume = 1;
+                //     utterance.rate = 1;
+                //     console.log(welcomeText);
+                //     window.speechSynthesis.speak(utterance);
+                //     welcomePlayed = true;
+                // }
+                welcomeText = "Clothing, here. Press enter for an example.";
+                const utterance = new SpeechSynthesisUtterance(welcomeText);
+                utterance.lang = "en-US";
+                utterance.volume = 1;
+                utterance.rate = 1;
+                console.log(welcomeText);
+                window.speechSynthesis.speak(utterance);
+                welcomePlayed = true;
             }
             
             /**
@@ -438,34 +448,38 @@
                 }
                 analysisText = analysisText.replace(/%/g, " percent");
 
-                if (!localAudio) {
-                    const formData = new FormData();
-                    formData.append("text", analysisText);
-                    console.log([...formData]);
-                    const response = await fetch("/describe_speech", {
-                        method: "POST",
-                        body: formData,
-                    });
-                    if (!response.ok) {
-                        const errorText = await response.text();
-                        console.error("Failed to get audio response:", errorText);
-                        return;
-                    }
-                    if (currentAudio) {
-                        currentAudio.pause();
-                        currentAudio.currentTime = 0;
-                    }
-                    const blob = await response.blob();
-                    const audioURL = URL.createObjectURL(blob);
-                    currentAudio = new Audio(audioURL);
-                    currentAudio.play().catch(err => console.warn("Playback blocked: ", err));
-                }
-                else {
-                    const utterance = new SpeechSynthesisUtterance(analysisText);
-                    utterance.lang = "en-US";
-                    window.speechSynthesis.cancel();
-                    window.speechSynthesis.speak(utterance);
-                }   
+                // if (!localAudio) {
+                //     const formData = new FormData();
+                //     formData.append("text", analysisText);
+                //     console.log([...formData]);
+                //     const response = await fetch("/describe_speech", {
+                //         method: "POST",
+                //         body: formData,
+                //     });
+                //     if (!response.ok) {
+                //         const errorText = await response.text();
+                //         console.error("Failed to get audio response:", errorText);
+                //         return;
+                //     }
+                //     if (currentAudio) {
+                //         currentAudio.pause();
+                //         currentAudio.currentTime = 0;
+                //     }
+                //     const blob = await response.blob();
+                //     const audioURL = URL.createObjectURL(blob);
+                //     currentAudio = new Audio(audioURL);
+                //     currentAudio.play().catch(err => console.warn("Playback blocked: ", err));
+                // }
+                // else {
+                //     let utterance = new SpeechSynthesisUtterance(analysisText);
+                //     utterance.lang = "en-US";
+                //     window.speechSynthesis.cancel();
+                //     window.speechSynthesis.speak(utterance);
+                // }   
+                let utterance = new SpeechSynthesisUtterance(analysisText);
+                utterance.lang = "en-US";
+                window.speechSynthesis.cancel();
+                window.speechSynthesis.speak(utterance);
                 analyzeButtonText.textContent = "Listen to Analysis";
             }
 

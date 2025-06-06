@@ -1,4 +1,4 @@
-FROM python:3.10-slim
+FROM python:3.10
 
 # System config
 ENV PYTHONDONTWRITEBYTECODE=1
@@ -17,8 +17,7 @@ COPY main.py requirements.txt ./
 COPY static/ ./static/
 
 # Install Python packages
-RUN pip install --upgrade pip && \
-    pip install --no-cache-dir -r requirements.txt || tail -n 50 /root/.cache/pip/log/debug.log
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Default port
 ENV PORT=8000
