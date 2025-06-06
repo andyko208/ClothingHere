@@ -7,6 +7,7 @@ FastAPI can be deployed for free on platforms like Render, Railway, Deta Space, 
 Just make sure your main.py and static/ folder are in your repo.
 Most platforms will run your app with a command like uvicorn main:app --host 0.0.0.0 --port 10000.
 """
+import io
 import os
 import json
 import random
@@ -103,7 +104,7 @@ async def welcome_speech():
     #     save(audio, WELCOME_SPEECH)
     # return FileResponse(WELCOME_SPEECH, media_type="audio/mpeg")
     audio = tts.text_to_speech.convert(
-        text="Clothing here. Press space bar for an example.", 
+        text="Clothing here. Press enter for an example.", 
         voice_id="JBFqnCBsd6RMkjVDRZzb",
         model_id="eleven_multilingual_v2",
         output_format="mp3_44100_128",
@@ -129,4 +130,6 @@ async def describe_speech(text: str = Form(...)):
         model_id="eleven_multilingual_v2",
         output_format="mp3_44100_128",
     )
-    return StreamingResponse(audio, media_type="audio/mpeg")
+    # return StreamingResponse(audio, media_type="audio/mpeg")
+    audio_bytes = b"".join(audio)  # ⬅️ buffer entire audio here
+    return StreamingResponse(io.BytesIO(audio_bytes), media_type="audio/mpeg")

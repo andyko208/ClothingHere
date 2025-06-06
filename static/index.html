@@ -42,6 +42,7 @@
             <div class="layout-container flex h-full grow flex-col">
                 <main class="flex flex-1 flex-col items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
                     <div class="w-full max-w-2xl space-y-8">
+                        <p class="text-center mt-2 text-base text-gray-400">Press space bar to begin</p>
                         <div class="text-center">
                             <h1 class="text-3xl font-bold tracking-tight text-gray-50 sm:text-4xl" 
                             style="color: black; font-family: Arial, Helvetica, sans-serif; font-size: 110px;">
@@ -112,10 +113,10 @@
                             <div class="flex flex-col sm:flex-row items-start gap-4 rounded-lg p-4 shadow-sm border-2 border-gray-700">
                                 <div class="relative w-full sm:w-48 h-37 rounded-md overflow-hidden border border-gray-700">
                                     <img
-                                        alt="Uploaded Clothing Preview"
+                                        alt="Clothing Preview"
                                         class="h-full w-full object-contain"
                                         id="image-preview"
-                                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuBBaEMQrgAwZo7eIeMvzZzG_e9hyP5piPzg79JvzLF_s1JSWcdKXfZEJHOzd76uoMh420t5HA6Q-MKPgFEIczsDwL9eB2sSdtfvoCD4W54BcdM6C1QIvMpgq81RyNRb8-4F7t4q7jcYCasLqwu6xl9L_dY2RfEyPBvtbcjcrLEYQWiO7rYFADtPAjnad5I8HNhWUJxXUA8VZXY5pwNPHq-lgS972BPQgTZJ14Oe_T_i2lxbCbQfKcq-4FbHVexnjCVTa4dzc84OdED5"/>
+                                        src="https://fastly.picsum.photos/id/64/4326/2884.jpg?hmac=9_SzX666YRpR_fOyYStXpfSiJ_edO3ghlSRnH2w09Kg"/>
                                 </div>
                                 <div class="flex flex-col justify-between flex-1">
                                     <div>
@@ -124,7 +125,7 @@
                                     </div>
                                     <!-- LLM Model Selection option -->
                                     <select id="llm-select" class="rounded-md text-sm p-2" style="margin: 10px 0 10px 0; background-color: black;">
-                                        <option value="0" title="Great for high volume and lower intelligence tasks">Gemini 1.5 Flash-8B</option>
+                                        <!-- <option value="0" title="Great for high volume, may fail to capture fabrics">Gemini 1.5 Flash-8B</option> -->
                                         <option value="1" title="Versatile across wide range of tasks">Gemini 1.5 Flash</option>
                                         <option value="2" title="Low-latency lightweight model">Gemini 2.0 Flash-Lite</option>
                                         <option value="3" title="High-speed with thinking">Gemini 2.0 Flash</option>
@@ -154,8 +155,39 @@
 
             // Triggered upon a single interaction from the user
             let currentAudio = null;
-            let hasPlayed = false;
-            document.addEventListener("mousemove", welcomeSpeech)
+            let welcomePlayed = false;
+            document.addEventListener("keydown", function(event) {
+                if (event.code === "Space" && !welcomePlayed) {
+                    event.preventDefault(); // prevent page scroll on spacebar
+                    console.log("Spacebar pressed!");
+                    welcomeSpeech(); // or any custom function
+                    welcomePlayed = true
+                }
+            });
+            let examplePlayed = false;
+            
+            document.addEventListener("keydown", async (event) => {
+                if (event.code === "Enter" && !examplePlayed) {
+                    const exampleImg = document.getElementById("image-preview");
+                    const imageUrl = exampleImg.src;
+                    try {
+                        const response = await fetch(imageUrl);
+                        const blob = await response.blob();
+                        const file = new File([blob], "preview.jpg", { type: blob.type });
+                        window.lastUploadedFile = file;
+                        await handleFile(file);  // Optional if you want UI to update
+
+                        // Now run analysis and speech
+                        await analyzeImage();    // Uses window.lastUploadedFile
+                        await describeSpeech(); // Uses results from analyzeImage
+                    } catch (err) {
+                        console.error("Failed to simulate file from image-preview:", err);
+                    }
+                    // handleFile();
+                    
+                    examplePlayed = true
+                }
+            });
             
             // Get DOM elements
             const dragArea = document.getElementById("drag-area");
@@ -233,6 +265,8 @@
                 }
             });
 
+            
+
             const modelDescriptions = {
                 0: "Best for high volume and lower intelligence tasks",
                 1: "Fast and versatile performance across a diverse variety of tasks.",
@@ -279,16 +313,16 @@
             });
 
             async function welcomeSpeech(event) {
-                if (hasPlayed) return;
-                hasPlayed = true;
+                if (welcomePlayed) return;
+                welcomePlayed = true;
                 const audio = new Audio("/welcome_speech");
                 try {
                     await audio.play();
-                    hasPlayed = true;
+                    welcomePlayed = true;
                     console.log("Audio played.");
                     document.removeEventListener("mousemove", welcomeSpeech);
                 } catch (err) {
-                    hasPlayed = false;
+                    welcomePlayed = false;
                     console.warn("Failed to play audio:", err);
                 }
             }
@@ -411,7 +445,6 @@
                     currentAudio.currentTime = 0;
                 }
                 const blob = await response.blob();
-                console.log(blob.type)
                 const audioURL = URL.createObjectURL(blob);
                 currentAudio = new Audio(audioURL);
                 currentAudio.play().catch(err => console.warn("Playback blocked: ", err));

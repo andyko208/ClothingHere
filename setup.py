@@ -33,7 +33,7 @@ class modelLog(BaseModel):
         return f"{self.timestamp}\t{self.model}\t{self.total_tokens}\t{self.input_tokens}\t{self.prompt_len}\t{self.img_pixels}\t{self.audio_sec}\t{self.output_tokens}\t{self.temperature}\t{self.top_p}\t{self.top_k}\t{self.system_instruction}\t{self.prompt}\t{self.response}\n"
 
 
-def setup_LLM(model_id=0) -> tuple[genai.Client, str]:
+def setup_LLM(model_id=1) -> tuple[genai.Client, str]:
     """LLM for analyzing images"""
     gemini_client = genai.Client(api_key=os.getenv("GOOGLEGENAI_API_KEY"))
     gemini_models = {
