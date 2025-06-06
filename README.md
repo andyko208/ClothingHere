@@ -18,4 +18,4 @@ ClothingHere aims to close that gap for users to truly enjoy clothing.
 
 > Simply get started by pressing space bar in the website. [^1]_
 
-[^1]: Chrome browser recommended for best experience.
+[^1]: Chrome browser may block audio at some point, Firefox browser recommended for best experience.
