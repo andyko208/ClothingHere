@@ -111,7 +111,7 @@
                         <!-- Image Preview Section -->
                         <div class="space-y-4 hidden" id="image-preview-section">
                             <div class="flex flex-col sm:flex-row items-start gap-4 rounded-lg p-4 shadow-sm border-2 border-gray-700">
-                                <div class="relative w-full sm:w-48 h-37 rounded-md overflow-hidden border border-gray-700">
+                                <div class="relative w-full sm:w-48 h-36 rounded-md overflow-hidden border border-gray-700">
                                     <img
                                         alt="Clothing Preview"
                                         class="h-full w-full object-contain"
@@ -276,7 +276,6 @@
             };
             const selectEl = document.getElementById("llm-select");
             let model_id = 0;
-            console.log(model_id)
             selectEl.addEventListener("change", function() {
                 model_id = selectEl.value;
                 chooseModel(model_id);
@@ -286,7 +285,6 @@
             async function chooseModel(model_id) {
                 const formData = new FormData();
                 formData.append("text", model_id);
-                console.log([...formData]);
                 await fetch("/choose_LLM", {
                     method: "POST",
                     body: formData,
@@ -320,7 +318,6 @@
                     await audio.play();
                     welcomePlayed = true;
                     console.log("Audio played.");
-                    document.removeEventListener("mousemove", welcomeSpeech);
                 } catch (err) {
                     welcomePlayed = false;
                     console.warn("Failed to play audio:", err);
@@ -350,9 +347,7 @@
                 });
                 if (response.ok) {
                     const data = await response.json();
-                    // console.log(data.status)
                     if (!data.status) {
-                        // console.log(data.status);
                         showError("unsupported");
                         fileInput.value = "";
                         return;
@@ -437,7 +432,8 @@
                     body: formData,
                 });
                 if (!response.ok) {
-                    console.error("Failed to get audio response.");
+                    const errorText = await response.text();
+                    console.error("Failed to get audio response:", errorText);
                     return;
                 }
                 if (currentAudio) {

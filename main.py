@@ -24,10 +24,20 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, File, Form, UploadFile
 from fastapi.responses import FileResponse, JSONResponse, HTMLResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
+from fastapi.middleware.cors import CORSMiddleware
+
+
 
 load_dotenv()   # Load environment variables from .env
 app = FastAPI() # Create FastAPI app
 app.mount("/static", StaticFiles(directory="static"), name="static")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # or your frontend domain
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 WELCOME_SPEECH = "welcome_speech.mp3"
 DESCRIBE_SPEECH = "describe_speech.mp3"
@@ -94,6 +104,13 @@ async def analyze_image(file: UploadFile = File(...)):
 from elevenlabs import save
 @app.get("/welcome_speech")
 async def welcome_speech():
+    audio = tts.text_to_speech.convert(
+        text="Clothing here. Press enter for an example.", 
+        voice_id="JBFqnCBsd6RMkjVDRZzb",
+        model_id="eleven_multilingual_v2",
+        output_format="mp3_44100_128",
+    )
+    return StreamingResponse(audio, media_type="audio/mpeg")
     # if not os.path.exists(WELCOME_SPEECH):
     #     audio = tts.text_to_speech.convert(
     #         text="Clothing here. Analyze and Elevate your Design Taste. Upload an image or press space bar to try a sample.", 
@@ -103,33 +120,21 @@ async def welcome_speech():
     #     )
     #     save(audio, WELCOME_SPEECH)
     # return FileResponse(WELCOME_SPEECH, media_type="audio/mpeg")
-    audio = tts.text_to_speech.convert(
-        text="Clothing here. Press enter for an example.", 
-        voice_id="JBFqnCBsd6RMkjVDRZzb",
-        model_id="eleven_multilingual_v2",
-        output_format="mp3_44100_128",
-    )
-    return StreamingResponse(audio, media_type="audio/mpeg")
 
 @app.post("/describe_speech")
 async def describe_speech(text: str = Form(...)):
-    # os.makedirs('descriptions/', exist_ok=True)
-    # describe_speech = f"descriptions/{text[-10:]}.mp3"
-    # if not os.path.exists(describe_speech):
-    #     audio = tts.text_to_speech.convert(
-    #         text=text,
-    #         voice_id="JBFqnCBsd6RMkjVDRZzb",
-    #         model_id="eleven_multilingual_v2",
-    #         output_format="mp3_44100_128",
-    #     )
-    #     save(audio, describe_speech)
-    # return FileResponse(describe_speech, media_type="audio/mpeg")
-    audio = tts.text_to_speech.convert(
-        text=text,
-        voice_id="JBFqnCBsd6RMkjVDRZzb",
-        model_id="eleven_multilingual_v2",
-        output_format="mp3_44100_128",
-    )
-    # return StreamingResponse(audio, media_type="audio/mpeg")
-    audio_bytes = b"".join(audio)  # ⬅️ buffer entire audio here
-    return StreamingResponse(io.BytesIO(audio_bytes), media_type="audio/mpeg")
+    os.makedirs("tmp_audio", exist_ok=True)
+    path = f"tmp_audio/{hash(text)}.mp3"
+    if not os.path.exists(path):
+        try:
+            audio = tts.text_to_speech.convert(
+                text=text,
+                voice_id="JBFqnCBsd6RMkjVDRZzb",
+                model_id="eleven_multilingual_v2",
+                output_format="mp3_44100_128",
+            )
+            save(audio, path)
+        except Exception as e:
+            print("TTS conversion error:", e)
+            return JSONResponse(status_code=500, content={"error": str(e)})
+    return FileResponse(path, media_type="audio/mpeg")
