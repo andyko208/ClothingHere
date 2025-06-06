@@ -179,6 +179,7 @@
 
                         // Now run analysis and speech
                         await analyzeImage();    // Uses window.lastUploadedFile
+                        analyzeMode = false;
                         await describeSpeech(); // Uses results from analyzeImage
                     } catch (err) {
                         console.error("Failed to simulate file from image-preview:", err);

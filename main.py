@@ -25,7 +25,8 @@ from fastapi.responses import FileResponse, JSONResponse, HTMLResponse, Streamin
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 
-
+import os
+print(f"🚀 App starting on port {os.getenv('PORT', 'not set')}")
 
 load_dotenv()   # Load environment variables from .env
 app = FastAPI() # Create FastAPI app
