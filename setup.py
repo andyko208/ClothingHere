@@ -6,7 +6,7 @@ from pydantic import BaseModel, PositiveInt
 
 from google import genai
 from google.genai import types, client
-from elevenlabs import ElevenLabs
+# from elevenlabs import ElevenLabs
 
 
 # class Output(BaseModel):
@@ -47,11 +47,11 @@ def setup_LLM(model_id=1) -> tuple[genai.Client, str]:
     gemini_model = gemini_models[model_id]
     return gemini_client, gemini_model
 
-def setup_TTS() -> ElevenLabs:
-    elevenlabs = ElevenLabs(
-        api_key=os.getenv("ELEVENLABS_API_KEY"),
-    )
-    return elevenlabs
+# def setup_TTS() -> ElevenLabs:
+#     elevenlabs = ElevenLabs(
+#         api_key=os.getenv("ELEVENLABS_API_KEY"),
+#     )
+#     return elevenlabs
 
 def set_modelLog(model: str, config: types.GenerateContentConfig, contents: dict, response: types.GenerateContentResponse) -> modelLog:
     """

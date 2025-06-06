@@ -11,13 +11,12 @@ import io
 import os
 import json
 import random
-# import cairosvg
 
 from PIL import Image
 import pillow_avif
 from pillow_heif import register_heif_opener
 
-from setup import setup_LLM, setup_TTS, set_config, set_modelLog
+from setup import setup_LLM, set_config, set_modelLog
 from google import genai
 
 from dotenv import load_dotenv
@@ -42,7 +41,7 @@ app.add_middleware(
 WELCOME_SPEECH = "welcome_speech.mp3"
 DESCRIBE_SPEECH = "describe_speech.mp3"
 client, model = setup_LLM()
-tts = setup_TTS()
+# tts = setup_TTS()
 config = set_config(
     instruction="You are a fashion designer. Your job is to detect as many fabrics as precisely as possible with confidence scores "
             "and provide a detailed description of the clothing's design, shape, color, and texture in 1-2 sentences. "
@@ -94,7 +93,7 @@ async def analyze_image(file: UploadFile = File(...)):
         config=config,
         contents=[contents['img'], contents['text']],
     )
-    set_modelLog(model, config, contents, response)
+    # set_modelLog(model, config, contents, response)
     
     if response.text:
         r = response.text
@@ -123,5 +122,3 @@ async def describe_speech(text: str = Form(...)):
             print("TTS conversion error:", e)
             return JSONResponse(status_code=500, content={"error": str(e)})
     return FileResponse(path, media_type="audio/mpeg")
-
-
