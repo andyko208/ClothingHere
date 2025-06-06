@@ -1,0 +1,10 @@
+.DS_Store
+.env
+.venv
+.git/
+.gitignore
+.nixpacks.toml
+render.yaml
+railway.json
+logs
+__pycache__
