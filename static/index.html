@@ -55,7 +55,7 @@
                             class="drag-area-active relative flex flex-col items-center gap-6 rounded-lg border-2 border-gray-700 bg-gray-800 p-8 transition-all"
                             style="background-color: whitesmoke;"
                             id="drag-area">
-                            <span class="material-icons-outlined text-8xl text-emerald-400">
+                            <span class="material-icons-outlined text-8xl text-gray-400">
                                 upload_file
                             </span>
                             <!-- <button
@@ -77,11 +77,12 @@
                                 accept="image/jpeg, image/png"
                                 class="absolute inset-0 h-full w-full cursor-pointer opacity-0"
                                 id="fileInput"
+                                style="background-color: white;"
                                 type="file"/>
                         </div>
                         <!-- Success Toast -->
                         <div
-                            class="hidden success-toast fixed bottom-5 right-5 flex items-center gap-3 rounded-md bg-emerald-600 p-4 shadow-lg"
+                            class="hidden success-toast fixed bottom-5 right-5 flex items-center gap-3 rounded-md bg-gray-600 p-4 shadow-lg"
                             id="success-message">
                             <span class="material-icons-outlined text-white">check_circle</span>
                             <p class="text-sm font-medium text-white">Image uploaded.</p>
@@ -122,7 +123,7 @@
                                         <p class="text-xs" id="image-details" style="color: black">Filename.jpg, Size: MB</p>
                                     </div>
                                     <!-- LLM Model Selection option -->
-                                    <select id="llm-select" class="rounded-md bg-gray-800 text-sm p-2">
+                                    <select id="llm-select" class="rounded-md text-sm p-2" style="margin: 10px 0 10px 0; background-color: black;">
                                         <option value="0" title="Great for high volume and lower intelligence tasks">Gemini 1.5 Flash-8B</option>
                                         <option value="1" title="Versatile across wide range of tasks">Gemini 1.5 Flash</option>
                                         <option value="2" title="Low-latency lightweight model">Gemini 2.0 Flash-Lite</option>
@@ -131,7 +132,7 @@
                                     </select>
                                     <button
                                         id="analyze-button"
-                                        class="mt-3 flex items-center justify-center gap-2 rounded-md h-9 px-4 bg-emerald-600 text-white text-xs font-medium hover:bg-emerald-700 transition-colors sm:w-fit">
+                                        class="mt-3 flex items-center justify-center gap-2 rounded-md h-9 px-4 bg-gray-400 text-white text-xs font-medium hover:bg-gray-600 transition-colors sm:w-fit">
                                         <!-- <span class="material-icons-outlined text-sm">auto_awesome</span> -->
                                         <span class="material-icons-outlined text-sm">auto_awesome</span>
                                         <p id="analyze-button-text">Start Analyzing</p>
@@ -154,7 +155,7 @@
             // Triggered upon a single interaction from the user
             let currentAudio = null;
             let hasPlayed = false;
-            // document.addEventListener("mousemove", welcomeSpeech)
+            document.addEventListener("mousemove", welcomeSpeech)
             
             // Get DOM elements
             const dragArea = document.getElementById("drag-area");
@@ -277,20 +278,20 @@
                 }
             });
 
-            // async function welcomeSpeech(event) {
-            //     if (hasPlayed) return;
-            //     hasPlayed = true;
-            //     const audio = new Audio("/welcome_speech");
-            //     try {
-            //         await audio.play();
-            //         hasPlayed = true;
-            //         console.log("Audio played.");
-            //         document.removeEventListener("mousemove", welcomeSpeech);
-            //     } catch (err) {
-            //         hasPlayed = false;
-            //         console.warn("Failed to play audio:", err);
-            //     }
-            // }
+            async function welcomeSpeech(event) {
+                if (hasPlayed) return;
+                hasPlayed = true;
+                const audio = new Audio("/welcome_speech");
+                try {
+                    await audio.play();
+                    hasPlayed = true;
+                    console.log("Audio played.");
+                    document.removeEventListener("mousemove", welcomeSpeech);
+                } catch (err) {
+                    hasPlayed = false;
+                    console.warn("Failed to play audio:", err);
+                }
+            }
             
             /**
              * Handle file validation and preview

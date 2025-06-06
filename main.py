@@ -91,28 +91,42 @@ async def analyze_image(file: UploadFile = File(...)):
     return JSONResponse(content={"description": f'Request timeout.', "fabrics": {}})
 
 from elevenlabs import save
-# @app.get("/welcome_speech")
-# async def welcome_speech():
-#     if not os.path.exists(WELCOME_SPEECH):
-#         audio = tts.text_to_speech.convert(
-#             text="Clothing here. Analyze and Elevate your Design Taste. Upload an image or press space bar to try a sample.", 
-#             voice_id="JBFqnCBsd6RMkjVDRZzb",
-#             model_id="eleven_multilingual_v2",
-#             output_format="mp3_44100_128",
-#         )
-#         save(audio, WELCOME_SPEECH)
-#     return FileResponse(WELCOME_SPEECH, media_type="audio/mpeg")
+@app.get("/welcome_speech")
+async def welcome_speech():
+    # if not os.path.exists(WELCOME_SPEECH):
+    #     audio = tts.text_to_speech.convert(
+    #         text="Clothing here. Analyze and Elevate your Design Taste. Upload an image or press space bar to try a sample.", 
+    #         voice_id="JBFqnCBsd6RMkjVDRZzb",
+    #         model_id="eleven_multilingual_v2",
+    #         output_format="mp3_44100_128",
+    #     )
+    #     save(audio, WELCOME_SPEECH)
+    # return FileResponse(WELCOME_SPEECH, media_type="audio/mpeg")
+    audio = tts.text_to_speech.convert(
+        text="Clothing here. Press space bar for an example.", 
+        voice_id="JBFqnCBsd6RMkjVDRZzb",
+        model_id="eleven_multilingual_v2",
+        output_format="mp3_44100_128",
+    )
+    return StreamingResponse(audio, media_type="audio/mpeg")
 
 @app.post("/describe_speech")
 async def describe_speech(text: str = Form(...)):
-    os.makedirs('descriptions/', exist_ok=True)
-    describe_speech = f"descriptions/{text[-10:]}.mp3"
-    if not os.path.exists(describe_speech):
-        audio = tts.text_to_speech.convert(
-            text=text,
-            voice_id="JBFqnCBsd6RMkjVDRZzb",
-            model_id="eleven_multilingual_v2",
-            output_format="mp3_44100_128",
-        )
-        save(audio, describe_speech)
-    return FileResponse(describe_speech, media_type="audio/mpeg")
+    # os.makedirs('descriptions/', exist_ok=True)
+    # describe_speech = f"descriptions/{text[-10:]}.mp3"
+    # if not os.path.exists(describe_speech):
+    #     audio = tts.text_to_speech.convert(
+    #         text=text,
+    #         voice_id="JBFqnCBsd6RMkjVDRZzb",
+    #         model_id="eleven_multilingual_v2",
+    #         output_format="mp3_44100_128",
+    #     )
+    #     save(audio, describe_speech)
+    # return FileResponse(describe_speech, media_type="audio/mpeg")
+    audio = tts.text_to_speech.convert(
+        text=text,
+        voice_id="JBFqnCBsd6RMkjVDRZzb",
+        model_id="eleven_multilingual_v2",
+        output_format="mp3_44100_128",
+    )
+    return StreamingResponse(audio, media_type="audio/mpeg")
