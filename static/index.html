@@ -156,18 +156,25 @@
             // Triggered upon a single interaction from the user
             let localAudio = true;
             let currentAudio = null;
+            
             let welcomePlayed = false;
+            let welcomeText = "Clothing, here. Press enter for an example.";
+            let utterance = new SpeechSynthesisUtterance(welcomeText);
 
+            // Play welcome speech
             document.addEventListener("keydown", function(event) {
                 if (event.code === "Space" && !welcomePlayed) {
                     event.preventDefault(); // prevent page scroll on spacebar
+                    let voices = window.speechSynthesis.getVoices();
                     console.log("Spacebar pressed!");
-                    welcomeSpeech(); // or any custom function
+                    console.log(welcomeText);
+                    console.log(voices);
+                    window.speechSynthesis.speak(utterance);
                     welcomePlayed = true
                 }
             });
-            let examplePlayed = false;
             
+            let examplePlayed = false;
             document.addEventListener("keydown", async (event) => {
                 if (event.code === "Enter" && !examplePlayed) {
                     const exampleImg = document.getElementById("image-preview");
@@ -183,11 +190,11 @@
                         await analyzeImage();    // Uses window.lastUploadedFile
                         analyzeMode = false;
                         await describeSpeech(); // Uses results from analyzeImage
+                        analyzeButtonText.textContent = "Listen to Analysis";
                     } catch (err) {
                         console.error("Failed to simulate file from image-preview:", err);
                     }
                     // handleFile();
-                    
                     examplePlayed = true
                 }
             });
@@ -268,8 +275,6 @@
                 }
             });
 
-            
-
             const modelDescriptions = {
                 0: "Best for high volume and lower intelligence tasks",
                 1: "Fast and versatile performance across a diverse variety of tasks.",
@@ -301,7 +306,7 @@
                 selectEl.dispatchEvent(new Event("change"));
             };
 
-            analyzeButton.addEventListener("click", () => {
+            analyzeButton.addEventListener("click", async () => {
                 // Analyze mode
                 if (analyzeMode) {
                     analyzeImage();
@@ -309,7 +314,8 @@
                 }
                 // Listening mode
                 else {
-                    describeSpeech();
+                    await describeSpeech();
+                    analyzeButtonText.textContent = "Listen to Analysis";  
                 }
             });
 
@@ -336,13 +342,12 @@
                 //     window.speechSynthesis.speak(utterance);
                 //     welcomePlayed = true;
                 // }
-                welcomeText = "Clothing, here. Press enter for an example.";
-                const utterance = new SpeechSynthesisUtterance(welcomeText);
+                
                 utterance.lang = "en-US";
                 utterance.volume = 1;
                 utterance.rate = 1;
                 console.log(welcomeText);
-                window.speechSynthesis.speak(utterance);
+                await window.speechSynthesis.speak(utterance);
                 welcomePlayed = true;
             }
             
@@ -401,26 +406,6 @@
             }
             
 
-            async function analyzeImage() {
-                analyzeButtonText.textContent = "Analyzing...";
-                
-                const formData = new FormData();
-                formData.append("file", window.lastUploadedFile);
-                const response = await fetch("/analyze_image", {
-                    method: "POST",
-                    body: formData,
-                });
-                if (response.ok) {
-                    const data = await response.json();
-                    showAnalysisPanel(data);           
-                } else {
-                    document.getElementById("analyze-button").classList.add("hidden");
-                    document.getElementById("analyze-result").textContent = "Analysis failed. Please try again in a moment.";
-                }
-                
-                // showAnalysisPanel({"description": "The garment is a slim-fitting, black, sleeveless tank top made of organic cotton and paired with dark gray, knee-length shorts.", "fabrics": {"polyester": 0.7, "satin": 0.3}});
-            }
-
             function showAnalysisPanel(data) {
                 // document.getElementById("analysis-model").textContent = data.model;
                 document.getElementById("analysis-description").textContent = data.description;
@@ -438,16 +423,39 @@
                 document.getElementById("analysis-fabric").innerHTML = fabricHTML;
                 analyzeButtonText.textContent = "Listen to Analysis";
             }
+            
+            async function analyzeImage() {
+                analyzeButtonText.textContent = "Analyzing...";
+                
+                const formData = new FormData();
+                formData.append("file", window.lastUploadedFile);
+                const response = await fetch("/analyze_image", {
+                    method: "POST",
+                    body: formData,
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    showAnalysisPanel(data);           
+                } else {
+                    document.getElementById("analyze-button").classList.add("hidden");
+                    document.getElementById("analyze-result").textContent = "Analysis failed. Please try again in a moment.";
+                }
+                // showAnalysisPanel({"description": "The garment is a slim-fitting, black, sleeveless tank top made of organic cotton and paired with dark gray, knee-length shorts.", "fabrics": {"polyester": 0.7, "satin": 0.3}});
+            }
 
             async function describeSpeech() {
                 analyzeButtonText.textContent = "...";
+                
                 let analysisText = document.getElementById("analysis-description").textContent + ", ";
                 fabric_types = document.getElementsByClassName("fabric-types");
                 for (let i = 0; i < fabric_types.length; i++) {
                     analysisText += `${fabric_types[i].textContent}, `;
                 }
                 analysisText = analysisText.replace(/%/g, " percent");
-
+                utterance = new SpeechSynthesisUtterance(analysisText);
+                window.speechSynthesis.cancel();
+                console.log(analysisText);
+                window.speechSynthesis.speak(utterance);
                 // if (!localAudio) {
                 //     const formData = new FormData();
                 //     formData.append("text", analysisText);
@@ -475,12 +483,7 @@
                 //     utterance.lang = "en-US";
                 //     window.speechSynthesis.cancel();
                 //     window.speechSynthesis.speak(utterance);
-                // }   
-                let utterance = new SpeechSynthesisUtterance(analysisText);
-                utterance.lang = "en-US";
-                window.speechSynthesis.cancel();
-                window.speechSynthesis.speak(utterance);
-                analyzeButtonText.textContent = "Listen to Analysis";
+                // }            
             }
 
         </script>
