@@ -1,24 +1,27 @@
 FROM python:3.10-slim
 
-# Prevent .pyc files & enable real-time logs
+# System config
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
-
 WORKDIR /app
 
-# Copy code into container
-COPY . /app
+# Pre-install dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    libglib2.0-0 libsm6 libxrender1 libxext6 \
+    gcc libffi-dev libssl-dev \
+    && rm -rf /var/lib/apt/lists/*
 
-# Install system packages for image processing
-RUN apt-get update && apt-get install -y \
-    build-essential libglib2.0-0 libsm6 libxrender1 libxext6 && \
-    rm -rf /var/lib/apt/lists/*
+# Copy source code
+COPY main.py requirements.txt ./          
+COPY static/ ./static/
 
-# Install Python dependencies
-RUN pip install --upgrade pip && pip install -r requirements.txt
+# Install Python packages
+RUN pip install --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt || tail -n 50 /root/.cache/pip/log/debug.log
 
-# Set default port if not provided
+# Default port
 ENV PORT=8000
 
-# Start the FastAPI app
+# Run FastAPI
 CMD ["sh", "-c", "uvicorn main:app --host 0.0.0.0 --port ${PORT}"]

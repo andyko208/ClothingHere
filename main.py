@@ -108,7 +108,7 @@ async def welcome_speech():
     os.makedirs("tmp_audio", exist_ok=True)
     path = "tmp_audio/welcome.mp3"
     if not os.path.exists(path):
-        coqui_tts.tts_to_file(text="Clothing here. Press enter for an example.", file_path=path)
+        coqui_tts.tts_to_file(text="Clothing, here. Press enter for an example.", file_path=path)
     return FileResponse(path, media_type="audio/mpeg")
 
 
